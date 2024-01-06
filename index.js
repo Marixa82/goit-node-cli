@@ -1,8 +1,19 @@
 import * as contactsService from './contacts.js';
-// index.js
-const argv = require('yargs').argv;
+import { program } from 'commander';
 
-// TODO: рефакторити
+program
+    .option('-a, --action <type>', 'choose action')
+    .option('-i, --id <type>', 'user id')
+    .option('-n, --name <type>', 'user name')
+    .option('-e, --email <type>', 'user email')
+    .option('-p, --phone <type>', 'user phone');
+
+program.parse();
+
+const argv = program.opts();
+
+
+
 async function invokeAction({ action, id, name, email, phone }) {
     switch (action) {
         case 'list':
@@ -13,20 +24,24 @@ async function invokeAction({ action, id, name, email, phone }) {
         case 'get':
             const contactId = await contactsService.getContactById(id);
             return console.log(contactId);
-        default:
             break;
 
         case 'add':
-            const addContact = await contactsService.addContact({ id, name, email, phone });
+            const addContact = await contactsService.addContact({ name, email, phone });
             return console.log(addContact);
-
-            // ... name email phone
             break;
+        case 'update':
+            const updatedContact = await contactsService.updateContactById(id, {
+                name,
+                phone,
+                email,
+            });
+            return console.log(updatedContact);
 
         case 'remove':
-            // ... id
+            const removeContact = await contactsService.removeContact(id);
+            console.log(removeContact);
             break;
-
         default:
             console.warn('\x1B[31m Unknown action type!');
     }
